@@ -7,10 +7,18 @@ import { createClient } from "@/lib/supabase/server";
 // ---------------------------------------------------------------------------
 // Authenticatie
 // ---------------------------------------------------------------------------
+const CONFIG_ERROR =
+  "De app is nog niet volledig geconfigureerd (Supabase-verbinding ontbreekt). Probeer het zo nog eens.";
+
 export async function signIn(_prev: unknown, formData: FormData) {
   const email = String(formData.get("email") ?? "").trim();
   const password = String(formData.get("password") ?? "");
-  const supabase = await createClient();
+  let supabase;
+  try {
+    supabase = await createClient();
+  } catch {
+    return { error: CONFIG_ERROR };
+  }
   const { error } = await supabase.auth.signInWithPassword({ email, password });
   if (error) return { error: "Onjuist e-mailadres of wachtwoord." };
   redirect("/dashboard");
@@ -25,7 +33,12 @@ export async function signUp(_prev: unknown, formData: FormData) {
     return { error: "Kies een wachtwoord van minimaal 8 tekens." };
   }
 
-  const supabase = await createClient();
+  let supabase;
+  try {
+    supabase = await createClient();
+  } catch {
+    return { error: CONFIG_ERROR };
+  }
 
   // Alleen op uitnodiging: controleer via een databasefunctie of er een
   // openstaande uitnodiging is voor dit e-mailadres (geen service-role nodig).

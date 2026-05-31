@@ -1,12 +1,12 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { getSupabaseEnv } from "./env";
 
 // Ververst de Supabase-sessie en beschermt privé-routes.
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request });
 
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const { url, key } = getSupabaseEnv();
 
   // Geen Supabase-config (bv. omgevingsvariabelen nog niet ingesteld op de
   // host): niet crashen, gewoon doorlaten zodat de site blijft laden.
