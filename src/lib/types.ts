@@ -19,6 +19,7 @@ export type Team = {
 export type Match = {
   id: string;
   stage: string;
+  group_name: string | null;
   home_team_id: string | null;
   away_team_id: string | null;
   kickoff: string;
