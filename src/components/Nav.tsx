@@ -25,6 +25,7 @@ export default function Nav({
             </>
           )}
           <NavLink href="/dashboard">Dashboard</NavLink>
+          <NavLink href="/stats">Stats</NavLink>
           {isAdmin && <NavLink href="/admin">Beheer</NavLink>}
           <form action={signOut}>
             <button className="btn-ghost ml-1" type="submit">
