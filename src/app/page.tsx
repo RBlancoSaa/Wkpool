@@ -2,12 +2,29 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 
+// redirect() werkt intern via een thrown error; die moeten we doorlaten.
+function isRedirectError(e: unknown): boolean {
+  return (
+    typeof e === "object" &&
+    e !== null &&
+    "digest" in e &&
+    typeof (e as { digest?: unknown }).digest === "string" &&
+    (e as { digest: string }).digest.startsWith("NEXT_REDIRECT")
+  );
+}
+
 export default async function Home() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (user) redirect("/dashboard");
+  // Robuust: als Supabase (nog) niet geconfigureerd/bereikbaar is, tonen we
+  // gewoon de landingspagina i.p.v. een server-side fout.
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (user) redirect("/dashboard");
+  } catch (e) {
+    if (isRedirectError(e)) throw e;
+  }
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-pitch to-pitch-dark text-white">
