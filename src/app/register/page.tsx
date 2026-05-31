@@ -41,6 +41,11 @@ export default function RegisterPage() {
             <input className="input" id="password" name="password" type="password" required minLength={8} />
           </div>
           {state?.error && <p className="text-sm text-red-600">{state.error}</p>}
+          {state?.message && (
+            <p className="rounded-lg bg-green-50 p-3 text-sm text-green-700">
+              {state.message}
+            </p>
+          )}
           <SubmitButton />
           <p className="text-center text-sm text-slate-600">
             Heb je al een account?{" "}

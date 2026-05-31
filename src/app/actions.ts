@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { createClient, createAdminClient } from "@/lib/supabase/server";
+import { createClient } from "@/lib/supabase/server";
 
 // ---------------------------------------------------------------------------
 // Authenticatie
@@ -25,29 +25,35 @@ export async function signUp(_prev: unknown, formData: FormData) {
     return { error: "Kies een wachtwoord van minimaal 8 tekens." };
   }
 
-  // Alleen op uitnodiging: er moet een openstaande uitnodiging zijn voor dit e-mailadres.
-  const admin = createAdminClient();
-  const { data: invite } = await admin
-    .from("invitations")
-    .select("id")
-    .ilike("email", email)
-    .is("accepted_by", null)
-    .maybeSingle();
+  const supabase = await createClient();
 
-  if (!invite) {
+  // Alleen op uitnodiging: controleer via een databasefunctie of er een
+  // openstaande uitnodiging is voor dit e-mailadres (geen service-role nodig).
+  const { data: invited } = await supabase.rpc("has_open_invitation", {
+    p_email: email,
+  });
+
+  if (!invited) {
     return {
       error:
         "Geen geldige uitnodiging gevonden voor dit e-mailadres. Deelname is alleen op uitnodiging.",
     };
   }
 
-  const supabase = await createClient();
-  const { error } = await supabase.auth.signUp({
+  const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: { data: { full_name: fullName } },
   });
   if (error) return { error: error.message };
+
+  // Als e-mailbevestiging aan staat is er nog geen sessie: toon een melding.
+  if (!data.session) {
+    return {
+      message:
+        "Account aangemaakt! Bevestig je e-mailadres via de link in je mailbox en log daarna in.",
+    };
+  }
   redirect("/dashboard");
 }
 

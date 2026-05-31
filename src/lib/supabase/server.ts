@@ -26,14 +26,3 @@ export async function createClient() {
     },
   );
 }
-
-// Service-role client voor server-acties die RLS moeten omzeilen
-// (bv. uitnodiging-check bij registratie). NOOIT naar de browser sturen.
-export function createAdminClient() {
-  const { createClient: createSb } = require("@supabase/supabase-js");
-  return createSb(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    { auth: { autoRefreshToken: false, persistSession: false } },
-  );
-}
