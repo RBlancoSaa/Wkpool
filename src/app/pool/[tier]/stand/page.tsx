@@ -18,12 +18,34 @@ export default async function StandPage({
 
   const standings = (data as Standing[] | null) ?? [];
 
+  const leader = standings[0];
+
   return (
     <>
       <Nav tier={pool.tier} isAdmin={isAdmin} />
-      <main className="mx-auto max-w-3xl px-4 py-8">
-        <h1 className="text-2xl font-bold">Stand — {pool.name}</h1>
-        <p className="mt-1 text-slate-600">Wie de meeste punten heeft, wint.</p>
+      <main className="mx-auto max-w-3xl px-4 py-6">
+        {/* Banner */}
+        <div className="overflow-hidden rounded-2xl bg-gradient-to-br from-pitch to-pitch-light p-5 text-white shadow-md sm:p-6">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h1 className="flex items-center gap-2 text-xl font-bold sm:text-2xl">
+                <span>🏆</span> Stand
+              </h1>
+              <p className="mt-1 text-sm text-white/80">{pool.name}</p>
+            </div>
+            {leader && (
+              <div className="text-right">
+                <div className="text-xs text-white/70">Koploper</div>
+                <div className="text-lg font-bold">
+                  🥇 {leader.full_name || "Onbekend"}
+                </div>
+                <div className="text-xs text-white/80">
+                  {leader.total_points} punten
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
 
         <div className="card mt-6 overflow-hidden p-0">
           <table className="w-full text-sm">

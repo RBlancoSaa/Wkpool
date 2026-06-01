@@ -17,30 +17,49 @@ export default async function Dashboard() {
   ]);
 
   const memberOf = new Map((memberships ?? []).map((m) => [m.pool_id, m]));
+  const joinedCount = memberOf.size;
 
   return (
     <>
       <Nav isAdmin={profile?.is_admin} />
-      <main className="mx-auto max-w-5xl px-4 py-8">
-        <h1 className="text-2xl font-bold">
-          Hoi {profile?.full_name || "speler"} 👋
-        </h1>
-        <p className="mt-1 text-slate-600">
-          Kies hieronder aan welke pool(s) je meedoet. Je kunt aan beide
-          meedoen.
-        </p>
+      <main className="mx-auto max-w-5xl px-4 py-6">
+        {/* Banner */}
+        <div className="overflow-hidden rounded-2xl bg-gradient-to-br from-pitch to-pitch-light p-5 text-white shadow-md sm:p-6">
+          <h1 className="text-xl font-bold sm:text-2xl">
+            Hoi {profile?.full_name || "speler"} 👋
+          </h1>
+          <p className="mt-1 text-sm text-white/80">
+            {joinedCount > 0
+              ? `Je doet mee aan ${joinedCount} pool${joinedCount > 1 ? "s" : ""}. Succes met voorspellen!`
+              : "Kies hieronder aan welke pool(s) je meedoet — je mag aan beide."}
+          </p>
+        </div>
 
-        <div className="mt-6 grid gap-5 sm:grid-cols-2">
+        <h2 className="mt-6 text-sm font-semibold uppercase tracking-wide text-slate-500">
+          Pools
+        </h2>
+
+        <div className="mt-3 grid gap-5 sm:grid-cols-2">
           {(pools as Pool[] | null)?.map((pool) => {
             const membership = memberOf.get(pool.id);
             const isMember = Boolean(membership);
+            const isWin = pool.tier === "win";
             return (
-              <div key={pool.id} className="card flex flex-col">
+              <div
+                key={pool.id}
+                className={`card flex flex-col ${
+                  isWin ? "ring-1 ring-gold/40" : ""
+                }`}
+              >
                 <div className="flex items-center justify-between">
                   <h2 className="text-lg font-bold">
-                    {pool.tier === "win" ? "🏆" : "🎉"} {pool.name}
+                    {isWin ? "🏆" : "🎉"} {pool.name}
                   </h2>
-                  <span className="text-xl font-extrabold text-pitch">
+                  <span
+                    className={`text-xl font-extrabold ${
+                      isWin ? "text-amber-500" : "text-pitch"
+                    }`}
+                  >
                     {euro(pool.entry_fee_cents)}
                   </span>
                 </div>
